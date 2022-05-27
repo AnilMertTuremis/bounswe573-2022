@@ -1,0 +1,40 @@
+version: "3.3"
+
+services:
+  app:
+    
+    build:
+      context: .
+    restart: always
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c "python manage.py makemigrations &&
+             python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             python manage.py runserver 0.0.0.0:8000"
+
+    environment:
+      - DB_HOST=db
+      - DB_NAME=app
+      - DB_USER=anil
+      - DB_PASS=locklock123
+    depends_on:
+      - db
+    volumes:
+      - ./app:/app
+      - media_volume:/app/media
+      - static_volume:/app/static
+
+  db:
+    image: postgres:12-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: anil
+      POSTGRES_PASSWORD: locklock123
+
+volumes:
+  my_dbdata:
+  media_volume:
+  static_volume:
